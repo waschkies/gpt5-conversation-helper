@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GPT-5 Gesprächshelfer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Gesprächshelfer</h1>
+  <form id="form">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="company" placeholder="Firma" required>
+    <button type="submit">Leitfaden erstellen</button>
+  </form>
+  <pre id="output"></pre>
+
+  <script>
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const company = document.getElementById("company").value;
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, company })
+      });
+      const data = await res.json();
+      document.getElementById("output").textContent = data.reply || data.error;
+    });
+  </script>
+</body>
+</html>
