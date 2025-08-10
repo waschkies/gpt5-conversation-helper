@@ -1,0 +1,16 @@
+{
+  "name": "gpt5-helper",
+  "version": "1.0.0",
+  "description": "Simple project for GPT-5 conversation helper",
+  "main": "api/chat.js",
+  "scripts": {
+    "start": "node api/chat.js"
+  },
+  "dependencies": {
+    "openai": "^4.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
