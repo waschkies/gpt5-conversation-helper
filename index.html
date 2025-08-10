@@ -20,7 +20,7 @@
       const name = document.getElementById("name").value;
       const company = document.getElementById("company").value;
 
-      const res = await fetch("/api/chat.js", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, company })
