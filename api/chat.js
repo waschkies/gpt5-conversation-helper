@@ -1,36 +1,46 @@
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
-  }
-
-  const { name, company } = req.body;
-  if (!name || !company) {
-    return res.status(400).json({ error: "Name and company are required" });
-  }
-
-  const prompt = `
-Du bist ein Assistent, der Gesprächsleitfäden erstellt.
-Erstelle einen Leitfaden für ein Treffen mit ${name} von der Firma ${company}.
-Berücksichtige mögliche Gesprächspunkte, Networking-Tipps und Hintergrundfragen.
-`;
-
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-      }),
+    if (req.method !== "POST") {
+      console.error("Method not allowed:", req.method);
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    const { name, company } = req.body;
+    console.log("Request body:", req.body);
+
+    if (!name || !company) {
+      console.error("Missing name or company in request body");
+      return res.status(400).json({ error: "Missing name or company" });
+    }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "user",
+          content: `Create a conversation guide for ${name} from ${company}.`
+        }
+      ],
     });
 
-    const data = await response.json();
-    res.status(200).json({ reply: data.choices[0].message.content });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log("OpenAI response:", response);
+
+    if (!response.choices || response.choices.length === 0) {
+      console.error("No choices returned from OpenAI");
+      return res.status(500).json({ error: "No choices returned from OpenAI" });
+    }
+
+    const reply = response.choices[0].message.content;
+    res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 }
